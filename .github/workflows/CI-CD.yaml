@@ -28,5 +28,5 @@ jobs:
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/wisecow:${{ github.sha }}|" Kubernetes/wisecow-deployment.yaml
           kubectl apply -f Kubernetes/wisecow-deployment.yaml
           kubectl apply -f Kubernetes/wisecow-service.yaml
-          kubectl apply -f Kubernetes/wisecow-ingress.yaml
+          kubectl apply -f Kubernetes/ingress.yaml
 
