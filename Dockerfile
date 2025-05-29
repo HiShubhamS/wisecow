@@ -36,3 +36,4 @@ CMD ["/bin/bash", "-c", "./wisecow.sh && tail -f /dev/null"]
 
 
 #Adding comment for checking the workflow
+#checking pipeline 
