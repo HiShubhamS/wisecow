@@ -32,5 +32,6 @@ EXPOSE 4499
 
 #Run the script when the container starts 
 
-CMD ["./wisecow.sh"]
+CMD ["/bin/bash", "-c", "./wisecow.sh && tail -f /dev/null"]
+
 
