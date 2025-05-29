@@ -25,8 +25,8 @@ jobs:
 
       - name: Deploy to Minikube
         run: |
-          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/wisecow:${{ github.sha }}|" k8s/wisecow-deployment.yaml
-          kubectl apply -f k8s/wisecow-deployment.yaml
-          kubectl apply -f k8s/wisecow-service.yaml
-          kubectl apply -f k8s/wisecow-ingress.yaml
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/wisecow:${{ github.sha }}|" Kubernetes/wisecow-deployment.yaml
+          kubectl apply -f Kubernetes/wisecow-deployment.yaml
+          kubectl apply -f Kubernetes/wisecow-service.yaml
+          kubectl apply -f Kubernetes/wisecow-ingress.yaml
 
