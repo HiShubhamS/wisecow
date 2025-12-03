@@ -11,10 +11,29 @@ on:
 jobs:
 
   # ------------------------------------------------
-  # 🔹 1. AccuKnox DAST Scan
+  # 🔹 1. AccuKnox SAST Scan (Opengrep)
+  # ------------------------------------------------
+  sast-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run AccuKnox SAST (Opengrep)
+        uses: accuknox/sast-scan-opengrep-action@1.0.1
+        with:
+          accuknox_endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
+          accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }}
+          accuknox_label: ${{ secrets.ACCUKNOX_LABEL }}
+          soft_fail: true
+
+
+  # ------------------------------------------------
+  # 🔹 2. AccuKnox DAST Scan
   # ------------------------------------------------
   dast-scan:
     runs-on: ubuntu-latest
+    needs: sast-scan      # optional dependency
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,11 +48,13 @@ jobs:
           severity_threshold: "HIGH"
           dast_scan_type: "full-scan"
 
+
   # ------------------------------------------------
-  # 🔹 2. AccuKnox Secret Scan
+  # 🔹 3. AccuKnox Secret Scan
   # ------------------------------------------------
   secret-scan:
     runs-on: ubuntu-latest
+    needs: sast-scan
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -53,11 +74,13 @@ jobs:
           accuknox_label: ${{ secrets.ACCUKNOX_LABEL }}
           soft_fail: true
 
+
   # ------------------------------------------------
-  # 🔹 3. AccuKnox Container Scan
+  # 🔹 4. AccuKnox Container Scan
   # ------------------------------------------------
   container-scan:
     runs-on: ubuntu-latest
+    needs: sast-scan
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -68,16 +91,15 @@ jobs:
           soft_fail: false
           accuknox_endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
           accuknox_label: ${{ secrets.ACCUKNOX_LABEL }}
-          accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }}
-          image: "your-image-name"
-          tag: "latest"
-          severity: "LOW, MEDIUM, HIGH, CRITICAL, UNKNOWN"
+          accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }
+
 
   # ------------------------------------------------
-  # 🔹 4. AccuKnox IaC Scan
+  # 🔹 5. AccuKnox IaC Scan
   # ------------------------------------------------
   iac-scan:
     runs-on: ubuntu-latest
+    needs: sast-scan
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
