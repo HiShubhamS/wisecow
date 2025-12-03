@@ -1,32 +1,96 @@
-name: CI/CD for wisecow
+name: AccuKnox Complete Security Scan Workflow
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build-and-deploy:
-    runs-on: self-hosted
+
+  # ------------------------------------------------
+  # 🔹 1. AccuKnox DAST Scan
+  # ------------------------------------------------
+  dast-scan:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+      - name: Run AccuKnox DAST Scan
+        uses: accuknox/dast-scan-action@v1.0.1
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          target_url: "http://testphp.vulnweb.com"
+          accuknox_endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
+          accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }}
+          accuknox_label: ${{ secrets.ACCUKNOX_LABEL }}
+          severity_threshold: "HIGH"
+          dast_scan_type: "full-scan"
 
-      - name: Build and push Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/wisecow:${{ github.sha }} .
-          docker push ${{ secrets.DOCKER_USERNAME }}/wisecow:${{ github.sha }}
+  # ------------------------------------------------
+  # 🔹 2. AccuKnox Secret Scan
+  # ------------------------------------------------
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Deploy to Minikube
-        run: |
-          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/wisecow:${{ github.sha }}|" Kubernetes/wisecow-deployment.yaml
-          kubectl apply -f Kubernetes/wisecow-deployment.yaml
-          kubectl apply -f Kubernetes/wisecow-service.yaml
-          kubectl apply -f Kubernetes/ingress.yaml
+      - name: Run Secret Scan
+        uses: accuknox/secret-scan-action@v0.0.1
+        with:
+          branch: "main"
+          results: ""
+          exclude_paths: "tests/,docs/"
+          additional_arguments: ""
+          base_command: ""
+          output_format: json
+          output_file_path: "./secret_results.json"
+          accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }}
+          accuknox_endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
+          accuknox_label: ${{ secrets.ACCUKNOX_LABEL }}
+          soft_fail: true
 
+  # ------------------------------------------------
+  # 🔹 3. AccuKnox Container Scan
+  # ------------------------------------------------
+  container-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run AccuKnox Container Scanner
+        uses: accuknox/container-scan-action@v1.0.1
+        with:
+          soft_fail: false
+          accuknox_endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
+          accuknox_label: ${{ secrets.ACCUKNOX_LABEL }}
+          accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }}
+          image: "your-image-name"
+          tag: "latest"
+          severity: "LOW, MEDIUM, HIGH, CRITICAL, UNKNOWN"
+
+  # ------------------------------------------------
+  # 🔹 4. AccuKnox IaC Scan
+  # ------------------------------------------------
+  iac-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run IaC scan
+        uses: accuknox/iac-scan-action@v1.0.1
+        with:
+          directory: "."
+          compact: true
+          quiet: true
+          output_format: json
+          output_file_path: "./results.json"
+          soft_fail: true
+          accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }}
+          accuknox_endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
+          accuknox_label: ${{ secrets.ACCUKNOX_LABEL }}
