@@ -88,19 +88,20 @@ jobs:
   container-scan:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@main
+    - name: Checkout code
+      uses: actions/checkout@main
 
-      - name: Run AccuKnox Container Scanner
-        uses: accuknox/container-scan-action@main
-        with:
-          soft_fail: false
-          accuknox_endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
-          accuknox_label: ${{ secrets.ACCUKNOX_LABEL }}
-          accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }}
-          image: "gcshubham/wisecow"
-          tag: "${{ github.sha }}"
-          severity: "LOW, MEDIUM, HIGH, CRITICAL, UNKNOWN"
+    - name: Run AccuKnox Container Scanner
+      uses: accuknox/container-scan-action@main
+      with:
+        soft_fail: false
+        accuknox_endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
+        accuknox_label: ${{ secrets.ACCUKNOX_LABEL }}
+        accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }}
+        image_name: "gcshubham/wisecow"
+        tag: "${{ github.sha }}"
+        severity: "LOW, MEDIUM, HIGH, CRITICAL, UNKNOWN"
+
 
   iac-scan:
     runs-on: ubuntu-latest
