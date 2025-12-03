@@ -1,4 +1,4 @@
-name: Wisecow Workflow
+name: Wisecow workflow
 
 on:
   push:
@@ -38,12 +38,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@main
 
       - name: Run Accuknox SAST
-        uses: accuknox/sast-scan-opengrep-action@1.0.1
+        uses: accuknox/sast-scan-opengrep-action@main
         with:
-          accuknox_endpoint: ${{ secrets.ACCUKNOK_ENDPOINT }}
+          accuknox_endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
           accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }}
           accuknox_label: ${{ secrets.ACCUKNOX_LABEL }}
           soft_fail: true
@@ -52,10 +52,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@main
 
       - name: Run AccuKnox DAST Scan
-        uses: accuknox/dast-scan-action@v1.0.1
+        uses: accuknox/dast-scan-action@main
         with:
           target_url: "http://testphp.vulnweb.com"
           accuknox_endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
@@ -68,10 +68,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@main
 
       - name: Run Secret Scan
-        uses: accuknox/secret-scan-action@v0.0.1
+        uses: accuknox/secret-scan-action@main
         with:
           branch: "main"
           results: ""
@@ -89,15 +89,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
 
       - name: Run AccuKnox Container Scanner
-        uses: accuknox/container-scan-action@v1.0.1
+        uses: accuknox/container-scan-action@main
         with:
           soft_fail: false
           accuknox_endpoint: ${{ secrets.ACCUKNOX_ENDPOINT }}
           accuknox_label: ${{ secrets.ACCUKNOX_LABEL }}
           accuknox_token: ${{ secrets.ACCUKNOX_TOKEN }}
+          image: "gcshubham/wisecow"
+          tag: "${{ github.sha }}"
+          severity: "LOW, MEDIUM, HIGH, CRITICAL, UNKNOWN"
 
   iac-scan:
     runs-on: ubuntu-latest
@@ -106,7 +109,7 @@ jobs:
         uses: actions/checkout@main
 
       - name: Run IaC scan
-        uses: accuknox/iac-scan-action@v1.0.1
+        uses: accuknox/iac-scan-action@main
         with:
           directory: "."
           compact: true
